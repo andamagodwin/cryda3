@@ -4,20 +4,23 @@ import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/d
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useDriveStore } from '../../store/driveStore';
-import { supabase } from '../../utils/supabase';
-
-
+import { useWalletStore } from '../../store/walletStore';
+import { useActiveAccount } from 'thirdweb/react';
+import { sendTransaction } from 'thirdweb';
+import { BlockchainService, SupabaseIntegration } from '../../services/blockchainService';
 
 export default function CreateDriveForm() {
-  const { startLocation, endLocation } = useDriveStore( );
+  const { startLocation, endLocation } = useDriveStore();
+  const { isConnected: isWalletConnected, address: walletAddress } = useWalletStore();
+  const account = useActiveAccount();
+  
   const [price, setPrice] = useState('');
-
   const [driverName, setDriverName] = useState('');
   const [carType, setCarType] = useState('');
   const [numberPlate, setNumberPlate] = useState('');
   const [seats, setSeats] = useState('');
-
-
+  const [paymentMethod, setPaymentMethod] = useState<'ETH' | 'CRYDA_TOKEN'>('ETH');
+  const [isCreating, setIsCreating] = useState(false);
   const [date, setDate] = useState(new Date());
   const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date');
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -50,41 +53,74 @@ export default function CreateDriveForm() {
   };
 
   const handleSubmit = async () => {
-  if (!driverName || !carType || !numberPlate || !seats || !startLocation || !endLocation) {
-    Alert.alert('Missing Fields', 'Please fill all the required fields.');
-    return;
-  }
+    if (!driverName || !carType || !numberPlate || !seats || !startLocation || !endLocation || !price) {
+      Alert.alert('Missing Fields', 'Please fill all the required fields.');
+      return;
+    }
 
-  const departureTime = date.toISOString(); // Convert to ISO format
+    if (!isWalletConnected || !account) {
+      Alert.alert('Wallet Required', 'Please connect your wallet to create a ride.');
+      return;
+    }
 
-  const { error } = await supabase.from('drives').insert({
-    driver_name: driverName,
-    car_type: carType,
-    number_plate: numberPlate,
-    seats: Number(seats),
-    price: Number(price),
-    start_location: startLocation,
-    end_location: endLocation,
-    departure_time: departureTime,
-  });
+    setIsCreating(true);
 
-  if (error) {
-    console.error('Supabase insert error:', error);
-    Alert.alert('Error', 'Failed to create drive.');
-  } else {
-    // Optionally add to Zustand store
-    
+    try {
+      // 1. Create ride record in Supabase first
+      const supabaseRideId = await SupabaseIntegration.createRideRecord({
+        startLocation: typeof startLocation === 'string' ? startLocation : startLocation?.label || 'Unknown',
+        endLocation: typeof endLocation === 'string' ? endLocation : endLocation?.label || 'Unknown',
+        departureTime: date,
+        pricePerSeat: price,
+        totalSeats: parseInt(seats),
+        paymentMethod,
+        driverName,
+        carType,
+        numberPlate,
+      });
 
-    Alert.alert('Success', 'Drive has been created successfully.');
-    setDriverName('');
-    setCarType('');
-    setNumberPlate('');
-    setSeats('');
-    setPrice('');
-    setDate(new Date());
-    router.push('/'); // Navigate back to home
-  }
-};
+      // 2. Create ride on blockchain
+      const transaction = await BlockchainService.createRide({
+        startLocation: typeof startLocation === 'string' ? startLocation : startLocation?.label || 'Unknown',
+        endLocation: typeof endLocation === 'string' ? endLocation : endLocation?.label || 'Unknown',
+        departureTime: date,
+        pricePerSeat: price,
+        totalSeats: parseInt(seats),
+        paymentMethod,
+      });
+
+      // 3. Send transaction
+      const receipt = await sendTransaction({
+        transaction,
+        account,
+      });
+
+      // 4. Update Supabase with blockchain data (simplified - use timestamp as ID for now)
+      const blockchainRideId = Date.now(); // In production, extract from contract events
+      await SupabaseIntegration.updateRideWithBlockchainData(
+        supabaseRideId,
+        blockchainRideId,
+        receipt.transactionHash
+      );
+
+      Alert.alert('Success', 'Ride created successfully on blockchain!');
+      
+      // Reset form
+      setDriverName('');
+      setCarType('');
+      setNumberPlate('');
+      setSeats('');
+      setPrice('');
+      setDate(new Date());
+      
+      router.push('/rides');
+    } catch (error: any) {
+      console.error('Error creating ride:', error);
+      Alert.alert('Error', error.message || 'Failed to create ride');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20, flexGrow: 1 ,width: '100%'}} className="bg-white w-11/12">
@@ -124,15 +160,48 @@ export default function CreateDriveForm() {
         className="border border-black rounded-lg p-3 mb-4"
       />
 
-      <Text className="mb-1 text-gray-600">Price per Seat (UGX)</Text>
+      <Text className="mb-1 text-gray-600">Price per Seat (ETH)</Text>
       <TextInput
         value={price}
         onChangeText={setPrice}
-        placeholder="e.g. 10000"
+        placeholder="e.g. 0.01"
         keyboardType="numeric"
         className="border border-black rounded-lg p-3 mb-4"
       />
 
+      {/* Payment Method Selector */}
+      <Text className="mb-1 text-gray-600">Payment Method</Text>
+      <View className="flex-row mb-4">
+        <TouchableOpacity
+          onPress={() => setPaymentMethod('ETH')}
+          className={`flex-1 p-3 rounded-lg mr-2 ${
+            paymentMethod === 'ETH' ? 'bg-primary' : 'bg-gray-200'
+          }`}
+        >
+          <Text className={`text-center font-semibold ${
+            paymentMethod === 'ETH' ? 'text-black' : 'text-gray-600'
+          }`}>ETH</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setPaymentMethod('CRYDA_TOKEN')}
+          className={`flex-1 p-3 rounded-lg ml-2 ${
+            paymentMethod === 'CRYDA_TOKEN' ? 'bg-primary' : 'bg-gray-200'
+          }`}
+        >
+          <Text className={`text-center font-semibold ${
+            paymentMethod === 'CRYDA_TOKEN' ? 'text-black' : 'text-gray-600'
+          }`}>CRYDA</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Wallet Connection Status */}
+      {!isWalletConnected && (
+        <View className="bg-yellow-100 p-3 rounded-lg mb-4">
+          <Text className="text-yellow-800 text-center">
+            Please connect your wallet to create rides on blockchain
+          </Text>
+        </View>
+      )}
 
       {/* Start Location */}
       <TouchableOpacity
@@ -191,9 +260,14 @@ export default function CreateDriveForm() {
       {/* Submit */}
       <TouchableOpacity
         onPress={handleSubmit}
-        className="bg-primary p-4 rounded-lg items-center"
+        disabled={isCreating}
+        className={`p-4 rounded-lg items-center ${
+          isCreating ? 'bg-gray-400' : 'bg-primary'
+        }`}
       >
-        <Text className="text-black font-bold text-lg">Create Drive</Text>
+        <Text className="text-black font-bold text-lg">
+          {isCreating ? 'Creating Ride...' : 'Create Ride on Blockchain'}
+        </Text>
       </TouchableOpacity>
 
       </View>

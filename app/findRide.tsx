@@ -1,23 +1,26 @@
-import { View, Text, ActivityIndicator, FlatList } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, ActivityIndicator, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../utils/supabase';
+import { format } from 'date-fns';
 
-// Define the structure of the location object stored in your database
-interface LocationObject {
-  label: string;
-  latitude: number;
-  longitude: number;
-}
-
-// Update the Ride interface to expect location objects
+// Updated Ride interface to match the new rides table structure
 interface Ride {
   id: number;
-  start_location: LocationObject;
-  end_location: LocationObject;
-  depature_time: string;
-  time: string;
-  driver_name?: string;
+  driver_id: string;
+  driver_name: string;
+  car_type: string;
+  number_plate: string;
+  start_location_label: string;
+  end_location_label: string;
+  departure_time: string;
+  price_per_seat: number;
+  total_seats: number;
+  payment_method: 'ETH' | 'CRYDA_TOKEN';
+  status: string;
+  blockchain_id?: number;
+  blockchain_tx_hash?: string;
+  created_at: string;
 }
 
 
@@ -33,25 +36,55 @@ export default function FindRide() {
   const fetchMatchingRides = async () => {
     setLoading(true);
 
-    const rideDate = new Date(date as string);
-    const rideDay = rideDate.toISOString().split('T')[0]; // format as YYYY-MM-DD
+    try {
+      const rideDate = new Date(date as string);
+      const rideDay = rideDate.toISOString().split('T')[0]; // format as YYYY-MM-DD
 
-    const { data, error } = await supabase
-      .from('drives')
-      .select('*')
-      // Use the ->> operator to search the 'label' field inside the JSONB column
-      .ilike('start_location->>label', `%${from}%`)
-      .ilike('end_location->>label', `%${to}%`)
-      .gte('departure_time', rideDay) // filters drives starting from selected date
-      .order('departure_time', { ascending: true });
+      const { data, error } = await supabase
+        .from('rides')
+        .select('*')
+        // Search in the text fields directly (no longer JSONB)
+        .ilike('start_location_label', `%${from}%`)
+        .ilike('end_location_label', `%${to}%`)
+        .gte('departure_time', rideDay) // filters rides starting from selected date
+        .eq('status', 'active') // only show active rides
+        .order('departure_time', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching rides:', error);
-    } else {
-      setRides(data || []);
+      if (error) {
+        console.error('Error fetching rides:', error);
+        Alert.alert('Error', 'Failed to fetch rides');
+      } else {
+        // Filter out rides from current user (don't show your own rides)
+        const { data: { session } } = await supabase.auth.getSession();
+        const filteredRides = data?.filter(ride => ride.driver_id !== session?.user?.id) || [];
+        setRides(filteredRides);
+      }
+    } catch (err) {
+      console.error('Fetch error:', err);
+      Alert.alert('Error', 'Failed to fetch rides');
     }
 
     setLoading(false);
+  };
+
+  const bookRide = (ride: Ride) => {
+    // Navigate to booking screen or show booking modal
+    Alert.alert(
+      'Book Ride',
+      `Book ride from ${ride.start_location_label} to ${ride.end_location_label}?\n\nPrice: ${ride.price_per_seat} ${ride.payment_method}\nSeats: ${ride.total_seats}`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Book Now', 
+          onPress: () => {
+            // For now, show success message. Later you can implement actual booking
+            Alert.alert('Booking', 'Booking functionality will be implemented soon!');
+            // TODO: Implement actual booking with blockchain integration
+            // router.push('/booking' as any);
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -68,12 +101,38 @@ export default function FindRide() {
           data={rides}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View className="bg-gray-100 p-4 mb-3 rounded-xl shadow-sm">
-              {/* Access the .label property of the location objects */}
-              <Text className="font-bold text-lg">{item.start_location.label} → {item.end_location.label}</Text>
-              <Text className="text-gray-700">Date: {item.depature_time}</Text>
-              <Text className="text-gray-600 mt-1">Driver: {item.driver_name || 'N/A'}</Text>
-            </View>
+            <TouchableOpacity 
+              onPress={() => bookRide(item)}
+              className="bg-gray-100 p-4 mb-3 rounded-xl shadow-sm border border-gray-200"
+            >
+              {/* Updated to use the new field names */}
+              <Text className="font-bold text-lg">{item.start_location_label} → {item.end_location_label}</Text>
+              <Text className="text-gray-700">
+                Date: {format(new Date(item.departure_time), 'MMM dd, yyyy • hh:mm a')}
+              </Text>
+              <Text className="text-gray-600 mt-1">Driver: {item.driver_name}</Text>
+              
+              {/* Additional ride details */}
+              <View className="mt-2 flex-row justify-between items-center">
+                <View>
+                  <Text className="text-sm text-gray-600">🚗 {item.car_type} • {item.number_plate}</Text>
+                  <Text className="text-sm text-gray-600">🪑 {item.total_seats} seats available</Text>
+                </View>
+                <View className="items-end">
+                  <Text className="font-bold text-lg text-green-600">
+                    {item.price_per_seat} {item.payment_method}
+                  </Text>
+                  {item.blockchain_tx_hash && (
+                    <Text className="text-xs text-blue-600">⛓️ On Blockchain</Text>
+                  )}
+                </View>
+              </View>
+              
+              {/* Book button */}
+              <View className="mt-3 bg-primary p-2 rounded-lg">
+                <Text className="text-center font-semibold text-black">Tap to Book</Text>
+              </View>
+            </TouchableOpacity>
           )}
         />
       )}
