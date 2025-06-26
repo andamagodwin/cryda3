@@ -15,6 +15,7 @@ import { StatusBar, View, ActivityIndicator } from "react-native";
 import { Colors } from "../constants/Colors";
 import 'react-native-reanimated';
 import "../global.css"
+import "@/utils/storage"; // Initialize storage testing
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -69,7 +70,7 @@ export default function RootLayout() {
 					backgroundColor={"#FFDE21"}
 					barStyle="light-content"
 				/>
-				
+
 				<Stack>
 					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 					<Stack.Screen name="(auth)" options={{ headerShown: false }} />

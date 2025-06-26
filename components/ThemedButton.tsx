@@ -15,6 +15,8 @@ export type ThemedButtonProps = {
 	loading?: boolean;
 	loadingTitle?: string;
 	variant?: "primary" | "secondary";
+	disabled?: boolean;
+	className?: string;
 };
 
 export function ThemedButton(props: ThemedButtonProps) {

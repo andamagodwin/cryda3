@@ -24,6 +24,8 @@ import {
 	hasStoredPasskey,
 	inAppWallet,
 } from "thirdweb/wallets/in-app";
+import { useWalletStore } from "@/store/walletStore";
+import { WalletInfo } from "@/components/WalletInfo";
 
 const wallets = [
 	inAppWallet({
@@ -71,10 +73,40 @@ let isLoggedIn = false;
 
 export default function HomeScreen() {
 	const account = useActiveAccount();
+	const wallet = useActiveWallet();
 	const theme = useColorScheme();
+	const { setWalletConnected, setWalletDisconnected, setEmail } = useWalletStore();
+
+	// Effect to sync wallet connection state with Zustand store
+	useEffect(() => {
+		if (account && wallet) {
+			// Store wallet data when connected
+			setWalletConnected({
+				address: account.address,
+				walletType: wallet.id,
+				walletId: wallet.id,
+				chainId: chain.id, // Use the chain from constants
+			});
+
+			console.log("Connected wallet:", wallet.id, "on chain:", chain.id);
+
+			// Get email for in-app wallets
+			if (wallet.id === "inApp") {
+				getUserEmail({ client }).then((email) => {
+					if (email) {
+						setEmail(email);
+					}
+				});
+			}
+		} else if (!account && !wallet) {
+			// Clear store when disconnected
+			setWalletDisconnected();
+		}
+	}, [account, wallet, setWalletConnected, setWalletDisconnected, setEmail]);
+
 	return (
 		<ParallaxScrollView
-			headerBackgroundColor={{ light: "white", dark: "#1D3D47" }}
+			headerBackgroundColor={{ light: "white", dark: "white" }}
 			headerImage={
 				<Image
 					source={require("@/assets/images/Wallet-bro.png")}
@@ -99,6 +131,8 @@ export default function HomeScreen() {
 				wallets={wallets}
 				chain={baseSepolia}
 			/>
+
+			<WalletInfo/>
 			{/* <View style={{ gap: 2 }}>
 				<ThemedText type="subtitle">{`Themed <ConnectButton />`}</ThemedText>
 				<ThemedText type="subtext">
