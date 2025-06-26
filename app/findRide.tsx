@@ -68,23 +68,23 @@ export default function FindRide() {
   };
 
   const bookRide = (ride: Ride) => {
-    // Navigate to booking screen or show booking modal
-    Alert.alert(
-      'Book Ride',
-      `Book ride from ${ride.start_location_label} to ${ride.end_location_label}?\n\nPrice: ${ride.price_per_seat} ${ride.payment_method}\nSeats: ${ride.total_seats}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Book Now', 
-          onPress: () => {
-            // For now, show success message. Later you can implement actual booking
-            Alert.alert('Booking', 'Booking functionality will be implemented soon!');
-            // TODO: Implement actual booking with blockchain integration
-            // router.push('/booking' as any);
-          }
-        }
-      ]
-    );
+    // Navigate to booking screen with ride data
+    router.push({
+      pathname: '/booking',
+      params: {
+        rideId: ride.id.toString(),
+        startLocation: ride.start_location_label,
+        endLocation: ride.end_location_label,
+        departureTime: ride.departure_time,
+        pricePerSeat: ride.price_per_seat.toString(),
+        totalSeats: ride.total_seats.toString(),
+        paymentMethod: ride.payment_method,
+        driverName: ride.driver_name,
+        carType: ride.car_type,
+        numberPlate: ride.number_plate,
+        blockchainTxHash: ride.blockchain_tx_hash || '',
+      }
+    });
   };
 
   return (

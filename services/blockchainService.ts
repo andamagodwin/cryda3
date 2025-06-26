@@ -446,16 +446,57 @@ export class BlockchainService {
   
   static async getCrydaBalance(userAddress: string) {
     try {
-      const balance = await readContract({
-        contract: crydaTokenContract,
-        method: "balanceOf",
-        params: [userAddress],
-      });
+      // Check if contract address is properly configured
+      if (!CONTRACT_ADDRESSES.CRYDA_TOKEN || CONTRACT_ADDRESSES.CRYDA_TOKEN === '0x...') {
+        console.warn('CRYDA token contract address not configured');
+        return '0';
+      }
+
+      console.log('Fetching CRYDA balance for:', userAddress);
+      console.log('Contract address:', CONTRACT_ADDRESSES.CRYDA_TOKEN);
+      console.log('Chain:', baseSepolia.name, baseSepolia.id);
       
-      return weiToEth(balance as bigint);
-    } catch (error) {
+      // First verify the contract exists by checking if it has code
+      try {
+        // Try reading from the contract to see if it exists
+        const balance = await readContract({
+          contract: crydaTokenContract,
+          method: "balanceOf",
+          params: [userAddress],
+        });
+        
+        const formattedBalance = weiToEth(balance as bigint);
+        console.log('CRYDA balance fetched successfully:', formattedBalance);
+        
+        return formattedBalance;
+      } catch (contractError: any) {
+        console.error('Contract read error:', contractError);
+        
+        // If it's a contract not found error, return 0
+        if (contractError.message?.includes('0x') || contractError.message?.includes('no contract code')) {
+          console.warn('Contract not found or no code at address');
+          return '0';
+        }
+        
+        // For other errors, still return 0 but log them
+        console.warn('Contract call failed, returning 0 balance:', contractError.message);
+        return '0';
+      }
+    } catch (error: any) {
       console.error('Error getting CRYDA balance:', error);
-      throw error;
+      
+      // Handle specific error cases
+      if (error.message?.includes('Cannot decode zero data')) {
+        console.warn('Contract returned zero data - contract may not be deployed correctly');
+        return '0';
+      }
+      
+      if (error.message?.includes('network')) {
+        throw new Error('Network connection failed');
+      }
+      
+      // For other errors, return 0 instead of throwing
+      return '0';
     }
   }
 }
@@ -570,15 +611,27 @@ export class SupabaseIntegration {
     txHash: string
   ) {
     try {
-      const { error } = await supabase
+      console.log('Updating booking with blockchain data:', {
+        supabaseId,
+        blockchainId,
+        txHash
+      });
+      
+      const { data, error } = await supabase
         .from('bookings')
         .update({
           blockchain_id: blockchainId,
           blockchain_tx_hash: txHash,
         })
-        .eq('id', supabaseId);
+        .eq('id', supabaseId)
+        .select(); // Add select to see what was updated
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase update error:', error);
+        throw error;
+      }
+      
+      console.log('Booking updated successfully:', data);
     } catch (error) {
       console.error('Error updating booking with blockchain data:', error);
       throw error;

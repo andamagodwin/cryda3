@@ -1,12 +1,11 @@
 // Contract addresses - Update these after deployment
 export const CONTRACT_ADDRESSES = {
-  CRYDA_TOKEN: '0xc59b7ad852ed9be49d1f338dd0e61a6fd234d901', 
-  RIDE_SHARE: '0x0c33146ee82b8653e8a648d96b0c9c8cdaea6118',
+  CRYDA_TOKEN: '0xc59b7ad852ed9be49d1f338dd0e61a6fd234d901', // ⚠️ REPLACE WITH YOUR DEPLOYED CRYDA TOKEN ADDRESS
+  RIDE_SHARE: '0x0c33146ee82b8653e8a648d96b0c9c8cdaea6118', // ⚠️ REPLACE WITH YOUR DEPLOYED RIDE SHARE ADDRESS
 };
 
 // Contract ABIs (simplified for common functions)
 export const CRYDA_TOKEN_ABI = [
-    [
 	{
 		"inputs": [
 			{
@@ -482,11 +481,9 @@ export const CRYDA_TOKEN_ABI = [
 		"stateMutability": "nonpayable",
 		"type": "function"
 	}
-]
 ];
 
 export const RIDE_SHARE_ABI = [
-    [
 	{
 		"inputs": [
 			{
@@ -1429,6 +1426,4 @@ export const RIDE_SHARE_ABI = [
 		"stateMutability": "view",
 		"type": "function"
 	}
-]
-
 ];
