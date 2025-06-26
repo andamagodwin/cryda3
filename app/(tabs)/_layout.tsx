@@ -17,7 +17,19 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="index"
 				options={{
-					title: "Connect",
+					title: "Home",
+					tabBarIcon: ({ color, focused }) => (
+						<TabBarIcon
+							name={focused ? "wallet" : "wallet-outline"}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="wallet"
+				options={{
+					title: "Wallet",
 					tabBarIcon: ({ color, focused }) => (
 						<TabBarIcon
 							name={focused ? "wallet" : "wallet-outline"}

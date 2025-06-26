@@ -1,6 +1,6 @@
 {
 	"expo": {
-		"name": "thirdweb playground",
+		"name": "cryda",
 		"slug": "thirdweb-playground",
 		"version": "1.0.0",
 		"orientation": "portrait",
@@ -46,6 +46,18 @@
 		"plugins": [
 			"expo-router",
 			[
+				"@rnmapbox/maps",
+        		{
+          			"RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYW5kYW1hZXpyYSIsImEiOiJjbWM4dndwMzUwenk2MmpyMmp3NW1zcG80In0.TIcX8_WM6GfdzqJHXNIf6g"
+        		}
+			],
+			[
+        		"expo-location",
+        		{
+        		  "locationWhenInUsePermission": "Show current location on map."
+        		}
+      		],		
+			[	
 				"expo-build-properties",
 				{
 					"android": {
