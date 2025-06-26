@@ -4,7 +4,7 @@ import Map from '@/components/Map/Map';
 export default function HomeScreen() {
     return (
         <View style={{ flex: 1 }}>
-            <Text>Home Screen</Text>
+            <Text className='bg-red-500'>Home Screen</Text>
             <Map />
         </View>
     );

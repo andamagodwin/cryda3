@@ -41,6 +41,8 @@
 		"expo-status-bar": "~2.2.3",
 		"expo-system-ui": "~5.0.6",
 		"expo-web-browser": "~14.1.6",
+		"nativewind": "^4.1.23",
+		"prettier-plugin-tailwindcss": "^0.5.11",
 		"react": "19.0.0",
 		"react-dom": "19.0.0",
 		"react-native": "0.79.2",
@@ -55,6 +57,7 @@
 		"react-native-screens": "4.10.0",
 		"react-native-svg": "15.11.2",
 		"react-native-web": "0.20.0",
+		"tailwindcss": "^3.4.17",
 		"thirdweb": "5.96.7",
 		"zustand": "^5.0.5"
 	},

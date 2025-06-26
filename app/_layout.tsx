@@ -12,6 +12,8 @@ import { ThirdwebProvider } from "thirdweb/react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { StatusBar } from "react-native";
 import { Colors } from "../constants/Colors";
+import 'react-native-reanimated';
+import "../global.css"
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
