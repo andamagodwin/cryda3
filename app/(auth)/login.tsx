@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Alert, AppState, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, AppState, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { supabase } from "../../utils/supabase";
 import { useRouter } from "expo-router";
 
@@ -36,10 +36,15 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 items-center justify-center px-6 bg-white">
-      <Text className="text-2xl font-bold mb-6">Login</Text>
+      <Image
+        source={require("../../assets/images/Login-bro.png")}
+
+        className="mb-6 w-64 h-64"
+      />
+      <Text className="text-2xl font-bold mb-6">Welcome Back!</Text>
 
       <TextInput
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4"
+        className="w-full border border-black rounded-lg px-4 py-3 mb-4"
         placeholder="Email"
         autoCapitalize="none"
         onChangeText={setEmail}
@@ -48,7 +53,7 @@ export default function LoginScreen() {
       />
 
       <TextInput
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4"
+        className="w-full border border-black rounded-lg px-4 py-3 mb-4"
         placeholder="Password"
         secureTextEntry
         onChangeText={setPassword}
@@ -56,7 +61,7 @@ export default function LoginScreen() {
       />
 
       <TouchableOpacity
-        className={`w-full bg-blue-600 rounded-lg py-3 mt-2 ${loading && "opacity-50"}`}
+        className={`w-full bg-primary rounded-lg py-3 mt-2 ${loading && "opacity-50"}`}
         onPress={handleLogin}
         disabled={loading}
       >

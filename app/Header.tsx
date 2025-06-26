@@ -9,7 +9,7 @@ export default function Header() {
     const hasNewNotifications = true;
 
     return (
-        <View className="w-full flex-row items-center justify-between bg-primary px-6 pt-6 pb-3 h-28">
+        <View className="w-full flex-row items-center justify-between bg-primary px-6 pt-2 pb-2 h-28">
             <View>
                 <TouchableOpacity className="flex-row items-center space-x-2 rounded-full bg-black px-3 py-1.5">
                     <Feather name="database" size={18} color="#FFDE21" />

@@ -56,7 +56,7 @@ export default function SignupScreen() {
       />
 
       <TouchableOpacity
-        className={`w-full bg-green-600 rounded-lg py-3 mt-2 ${loading && "opacity-50"}`}
+        className={`w-full bg-primary rounded-lg py-3 mt-2 ${loading && "opacity-50"}`}
         onPress={handleSignup}
         disabled={loading}
       >

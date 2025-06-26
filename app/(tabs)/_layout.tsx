@@ -2,6 +2,7 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Tabs } from "expo-router";
+import AntDesign from '@expo/vector-icons/AntDesign';
 import React from "react";
 
 export default function TabLayout() {
@@ -19,10 +20,7 @@ export default function TabLayout() {
 				options={{
 					title: "Home",
 					tabBarIcon: ({ color, focused }) => (
-						<TabBarIcon
-							name={focused ? "wallet" : "wallet-outline"}
-							color={color}
-						/>
+						<AntDesign name="home" size={28} color={color} />
 					),
 				}}
 			/>
@@ -31,46 +29,25 @@ export default function TabLayout() {
 				options={{
 					title: "Wallet",
 					tabBarIcon: ({ color, focused }) => (
-						<TabBarIcon
-							name={focused ? "wallet" : "wallet-outline"}
-							color={color}
-						/>
+						 <AntDesign name="wallet" size={28} color={color} />
 					),
 				}}
 			/>
 			<Tabs.Screen
-				name="read"
+				name="rides"
 				options={{
-					title: "Read",
+					title: "Rides",
 					tabBarIcon: ({ color, focused }) => (
-						<TabBarIcon
-							name={focused ? "reader" : "reader-outline"}
-							color={color}
-						/>
+						<AntDesign name="car" size={28} color={color} />
 					),
 				}}
 			/>
 			<Tabs.Screen
-				name="write"
+				name="profile"
 				options={{
-					title: "Write",
+					title: "Profile",
 					tabBarIcon: ({ color, focused }) => (
-						<TabBarIcon
-							name={focused ? "code-slash" : "code-slash-outline"}
-							color={color}
-						/>
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name="buy"
-				options={{
-					title: "Buy",
-					tabBarIcon: ({ color, focused }) => (
-						<TabBarIcon
-							name={focused ? "cart" : "cart-outline"}
-							color={color}
-						/>
+						<AntDesign name="user" size={28} color={color} />
 					),
 				}}
 			/>
