@@ -28,7 +28,7 @@ const TabSwitch = ({ onTabChange }: TabSwitchProps) => {
 
   return (
     <View className="items-center justify-center">
-      <View className="rounded-full bg-white shadow-lg p-2 w-[200px] max-w-[316px]">
+      <View className="rounded-full bg-white border border-[#FFDE21] p-2 w-[200px] max-w-[316px]">
         <View className="relative flex-row h-12">
           <Animated.View
             style={{

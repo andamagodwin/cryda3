@@ -57,9 +57,9 @@ const RideOptionsCard: React.FC<Props> = ({ fromCoords, toCoords }) => {
     date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
   return (
-    <View className="bg-white rounded-2xl p-5 mx-4 my-4 shadow-lg w-11/12">
+    <View className="bg-white rounded-2xl p-5 mx-4 my-4 border border-gray-200 w-11/12">
       <View className="flex-row justify-between items-center mb-5">
-        <Text className="text-[22px] font-bold text-[#333]">Plan Your Ride</Text>
+        <Text className="text-[22px] font-bold text-[#333]">😀 Lets Ride Together!</Text>
       </View>
 
       {/* Pickup Location */}

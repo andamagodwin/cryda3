@@ -9,7 +9,7 @@ import Animated, {
 
 import { ThemedView } from "@/components/ThemedView";
 
-const HEADER_HEIGHT = 200;
+const HEADER_HEIGHT = 380;
 
 type Props = PropsWithChildren<{
 	headerImage: ReactElement;

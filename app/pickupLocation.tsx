@@ -29,7 +29,7 @@ export default function PickupLocation() {
   };
 
   return (
-    <View className="flex-1 items-center bg-white">
+    <View className="flex-1 items-center bg-primary">
       <View className="z-10 absolute w-full max-w-md p-4">
         <DualLocationPicker
           onLocationsSelected={(fromCoords, toCoords) => {

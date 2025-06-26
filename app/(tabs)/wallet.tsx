@@ -74,15 +74,15 @@ export default function HomeScreen() {
 	const theme = useColorScheme();
 	return (
 		<ParallaxScrollView
-			headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
+			headerBackgroundColor={{ light: "white", dark: "#1D3D47" }}
 			headerImage={
 				<Image
-					source={require("@/assets/images/title.png")}
+					source={require("@/assets/images/Wallet-bro.png")}
 					style={styles.reactLogo}
 				/>
 			}
 		>
-			<ThemedView style={styles.titleContainer}>
+			{/* <ThemedView style={styles.titleContainer}>
 				<ThemedText type="title">Connecting Wallets</ThemedText>
 			</ThemedView>
 			<View style={{ gap: 2 }}>
@@ -92,20 +92,20 @@ export default function HomeScreen() {
 					state. Example below has Smart Accounts + sponsored transactions
 					enabled.
 				</ThemedText>
-			</View>
+			</View> */}
 			<ConnectButton
 				client={client}
 				theme={theme || "dark"}
 				wallets={wallets}
 				chain={baseSepolia}
 			/>
-			<View style={{ gap: 2 }}>
+			{/* <View style={{ gap: 2 }}>
 				<ThemedText type="subtitle">{`Themed <ConnectButton />`}</ThemedText>
 				<ThemedText type="subtext">
 					Styled the Connect Button to match your app.
 				</ThemedText>
-			</View>
-			<ConnectButton
+			</View> */}
+			{/* <ConnectButton
 				client={client}
 				theme={lightTheme({
 					colors: {
@@ -181,7 +181,7 @@ export default function HomeScreen() {
 					account or metamask EOA.
 				</ThemedText>
 			</View>
-			<CustomConnectUI />
+			<CustomConnectUI /> */}
 		</ParallaxScrollView>
 	);
 }
