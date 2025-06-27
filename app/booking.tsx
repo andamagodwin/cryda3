@@ -182,7 +182,7 @@ export default function BookingScreen() {
   return (
     <ScrollView className="flex-1 bg-white">
       {/* Header */}
-      <View className="bg-primary p-4">
+      {/* <View className="bg-primary p-4">
         <TouchableOpacity 
           onPress={() => router.back()}
           className="mb-4"
@@ -191,7 +191,7 @@ export default function BookingScreen() {
         </TouchableOpacity>
         <Text className="text-2xl font-bold text-black">Book Ride</Text>
         <Text className="text-gray-600 mt-1">Complete your blockchain booking</Text>
-      </View>
+      </View> */}
 
       <View className="p-4">
         {/* Ride Details Card */}

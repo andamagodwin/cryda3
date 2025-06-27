@@ -68,7 +68,7 @@ const RideOptionsCard: React.FC<Props> = ({ fromCoords, toCoords }) => {
         onPress={() => router.push('/pickupLocation')}
       >
         <View className="w-10 h-10 rounded-full items-center justify-center mr-4" style={{ backgroundColor: 'rgba(61,144,239,0.1)' }}>
-          <MaterialIcons name="location-pin" size={24} color="#FFDE21" />
+          <MaterialIcons name="location-pin" size={24} color="black" />
         </View>
         <View className="flex-1">
           <Text className="text-sm text-gray-500 mb-0.5">Pickup Location</Text>
@@ -88,7 +88,7 @@ const RideOptionsCard: React.FC<Props> = ({ fromCoords, toCoords }) => {
         onPress={() => router.push('/destination')}
       >
         <View className="w-10 h-10 rounded-full items-center justify-center mr-4" style={{ backgroundColor: 'rgba(255,107,107,0.1)' }}>
-          <FontAwesome name="map-marker" size={24} color="#FFDE21" />
+          <FontAwesome name="map-marker" size={24} color="black" />
         </View>
         <View className="flex-1">
           <Text className="text-sm text-gray-500 mb-0.5">Destination</Text>
@@ -108,7 +108,7 @@ const RideOptionsCard: React.FC<Props> = ({ fromCoords, toCoords }) => {
         onPress={() => showPicker('date')}
       >
         <View className="w-10 h-10 rounded-full items-center justify-center mr-4" style={{ backgroundColor: 'rgba(76,217,100,0.1)' }}>
-          <Ionicons name="calendar" size={24} color="#FFDE21" />
+          <Ionicons name="calendar" size={24} color="black" />
         </View>
         <View className="flex-1">
           <Text className="text-sm text-gray-500 mb-0.5">Pick Date</Text>
@@ -125,7 +125,7 @@ const RideOptionsCard: React.FC<Props> = ({ fromCoords, toCoords }) => {
         onPress={() => showPicker('time')}
       >
         <View className="w-10 h-10 rounded-full items-center justify-center mr-4" style={{ backgroundColor: 'rgba(255,206,84,0.1)' }}>
-          <Ionicons name="time" size={24} color="#ffce54" />
+          <Ionicons name="time" size={24} color="black" />
         </View>
         <View className="flex-1">
           <Text className="text-sm text-gray-500 mb-0.5">Pick Time</Text>
