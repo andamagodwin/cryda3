@@ -89,11 +89,37 @@ export default function CreateDriveForm() {
         paymentMethod,
       });
 
-      // 3. Send transaction
-      const receipt = await sendTransaction({
-        transaction,
-        account,
-      });
+      // 3. Send transaction with proper error handling
+      let receipt;
+      try {
+        receipt = await sendTransaction({
+          transaction,
+          account,
+        });
+      } catch (transactionError: any) {
+        console.error('Transaction error:', transactionError);
+        
+        // Handle paymaster errors specifically
+        if (transactionError.message?.includes('paymaster') || 
+            transactionError.message?.includes('AA31') ||
+            transactionError.message?.includes('deposit too low')) {
+          
+          Alert.alert(
+            'Gas Payment Required', 
+            'Unable to sponsor gas fees. You need Base Sepolia ETH to pay for gas fees. Make sure you have at least 0.001 ETH for gas.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Retry', onPress: () => {
+                // Retry the transaction - just show message for now
+                Alert.alert('Retry', 'Please ensure you have Base Sepolia ETH and try again.');
+              }}
+            ]
+          );
+          return;
+        }
+        
+        throw transactionError;
+      }
 
       // 4. Update Supabase with blockchain data (simplified - use timestamp as ID for now)
       const blockchainRideId = Date.now(); // In production, extract from contract events
